@@ -1,0 +1,24 @@
+# name: User Signup Request
+POST  http://localhost:3000/api/users/signup
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+###
+
+# name: User Signin Request
+POST  http://localhost:3000/api/users/signin
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+###
+
+# name: User signout Request
+POST  http://localhost:3000/api/users/signout
