@@ -25,74 +25,106 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
-## Project setup
+# Ayanis
+
+Lightweight NestJS API for user authentication and task management (users, tasks). Uses TypeORM + PostgreSQL and cookie-based sessions.
+
+**Tech stack:** Node.js, NestJS, TypeScript, TypeORM, PostgreSQL, Docker (optional)
+
+**Project structure (key folders):**
+
+- `src/users` — user entity, auth service and controllers
+- `src/tasks` — task entity, CRUD controller and service
+- `src/guards` — auth guard (session-based)
+- `src/app.module.ts` — global config and TypeORM setup
+
+**API prefix:** `/api` (see `src/main.ts`)
+
+---
+
+## Prerequisites
+
+- Node.js (v18+ recommended)
+- npm or yarn
+- PostgreSQL (local) or Docker to run the provided `docker-compose.yml`
+
+---
+
+## Quick start (development)
+
+1. Install dependencies
 
 ```bash
-$ npm install
+npm install
 ```
 
-## Compile and run the project
+2. Start a PostgreSQL instance (choose one):
+
+- Using Docker Compose (recommended):
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+docker compose up -d
 ```
 
-## Run tests
+- Or run a local Postgres and ensure credentials match the environment variables below.
+
+3. Create an environment file — this repo loads `.env.${NODE_ENV}`. For local development set `NODE_ENV=development` and create a file named `.env.development` (or set env vars directly).
+
+Example `.env.development`:
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+NODE_ENV=development
+PORT=3000
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=postgres
+DB_PASSWORD=password
+DB_NAME=postgres
+COOKIE_KEY=replace_with_a_secure_key
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+4. Run the app in watch mode
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npm run start:dev
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+The server listens on `http://localhost:3000` by default and serves the API under `http://localhost:3000/api`.
 
-## Resources
+---
 
-Check out a few resources that may come in handy when working with NestJS:
+## Database / TypeORM
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+- The project uses `@nestjs/typeorm` with `synchronize: true`, so TypeORM will auto-create/update tables based on entities. This is convenient for development.
 
-## Support
+---
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## Authentication
 
-## Stay in touch
+- Session-based authentication using `cookie-session`. After successful `signin`/`signup`, the server stores `userId` in the session cookie.
+- Auth-protected endpoints use `AuthGuard` which checks `request.session.userId`.
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+---
 
-## License
+## Important endpoints (examples)
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- Signup: `POST /api/users/signup` — body `{ "email": "you@example.com", "password": "pass" }`
+- Signin: `POST /api/users/signin` — body same as signup
+- Signout: `POST /api/users/signout`
+- Create task (authenticated): `POST /api/tasks` — body `{ "title": "...", "description": "..." }`
+- List tasks (authenticated): `GET /api/tasks`
+- Update task (authenticated): `PATCH /api/tasks/:id` — body `{ "title": "...", "description": "..." }`
+- Delete task (authenticated): `DELETE /api/tasks/:id`
+
+`You can try the requests in the request.http files under users and tasks`
+
+---
+
+## Running tests
+
+- Simple tests to showcase e2e and unit testing with mocking
+
+```bash
+npm run test
+npm run test:e2e
+```
